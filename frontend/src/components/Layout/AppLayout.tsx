@@ -31,7 +31,7 @@ import {
   AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
 
 const drawerWidth = 240;
@@ -170,11 +170,11 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 onClick={handleMenu}
                 startIcon={
                   <Avatar sx={{ width: 32, height: 32, bgcolor: '#e91e63' }}>
-                    {user.name.charAt(0)}
+                    {user.fullName?.charAt(0) || '?'}
                   </Avatar>
                 }
               >
-                {user.name}
+                {user.fullName || '未知用户'}
                 <Typography variant="caption" sx={{ ml: 1, opacity: 0.8 }}>
                   ({roleLabels[user.role]})
                 </Typography>

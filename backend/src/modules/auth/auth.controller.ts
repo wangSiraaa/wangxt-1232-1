@@ -1,7 +1,7 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, SetMetadata } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { JwtAuthGuard, IS_PUBLIC_KEY } from '@/common/guards/jwt-auth.guard';
 import { User } from '@/entities/user.entity';
 
 @ApiTags('认证')
@@ -10,6 +10,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @SetMetadata(IS_PUBLIC_KEY, true)
   async login(
     @Body() loginData: { username: string; password: string },
   ): Promise<{ accessToken: string; user: User }> {

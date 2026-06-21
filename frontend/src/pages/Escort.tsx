@@ -34,7 +34,7 @@ import {
 import { handoverApi, sealBoxesApi, batchesApi } from '@/api/client';
 import { HandoverRecord, HandoverStatus, SealBox, ExamBatch, BatchStatus, UserRole } from '@/types';
 import { toast } from 'react-toastify';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import dayjs from 'dayjs';
 
 interface TabPanelProps {
@@ -169,13 +169,13 @@ const Escort: React.FC = () => {
 
   const statusColors: Record<HandoverStatus, string> = {
     [HandoverStatus.PENDING]: '#ff9800',
-    [HandoverStatus.ACCEPTED]: '#4caf50',
+    [HandoverStatus.CONFIRMED]: '#4caf50',
     [HandoverStatus.REJECTED]: '#f44336',
   };
 
   const statusLabels: Record<HandoverStatus, string> = {
     [HandoverStatus.PENDING]: '待确认',
-    [HandoverStatus.ACCEPTED]: '已接受',
+    [HandoverStatus.CONFIRMED]: '已确认',
     [HandoverStatus.REJECTED]: '已拒绝',
   };
 
@@ -366,7 +366,7 @@ const Escort: React.FC = () => {
                 <Card sx={{ height: '100%', borderRadius: 3, borderRight: { md: 1, xs: 0 }, borderBottom: { md: 0, xs: 1 }, borderColor: 'divider' }}>
                   <CardContent sx={{ textAlign: 'center' }}>
                     <Typography variant="h4" fontWeight="bold" color="#4caf50">
-                      {incoming.filter(h => h.status === HandoverStatus.ACCEPTED).length}
+                      {incoming.filter(h => h.status === HandoverStatus.CONFIRMED).length}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       已接收
@@ -390,7 +390,7 @@ const Escort: React.FC = () => {
                 <Card sx={{ height: '100%', borderRadius: 3 }}>
                   <CardContent sx={{ textAlign: 'center' }}>
                     <Typography variant="h4" fontWeight="bold" color="#9c27b0">
-                      {outgoing.filter(h => h.status === HandoverStatus.ACCEPTED).length}
+                      {outgoing.filter(h => h.status === HandoverStatus.CONFIRMED).length}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       已完成发出

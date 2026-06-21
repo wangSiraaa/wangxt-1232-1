@@ -27,7 +27,7 @@ import {
   Error as ErrorIcon,
 } from '@mui/icons-material';
 import { batchesApi, exceptionsApi, handoverApi, recoveryApi } from '@/api/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { BatchStatus, ExamBatch, ExceptionRecord, HandoverRecord, UserRole } from '@/types';
 import dayjs from 'dayjs';
 
@@ -143,7 +143,7 @@ const Dashboard: React.FC = () => {
     <Box>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
-          欢迎回来，{user?.name}
+          欢迎回来，{user?.fullName}
         </Typography>
         <Typography variant="body1" color="text.secondary">
           {dayjs().format('YYYY年MM月DD日 dddd')}
@@ -332,7 +332,8 @@ const Dashboard: React.FC = () => {
                             <Typography variant="body2" fontWeight="medium">
                               {exc.type === 'seal_damaged' ? '封签破损' :
                                exc.type === 'package_missing' ? '试卷包缺失' :
-                               exc.type === 'quantity_mismatch' ? '数量不匹配' : '其他异常'}
+                               exc.type === 'count_mismatch' ? '数量不匹配' :
+                               exc.type === 'time_violation' ? '时间违规' : '其他异常'}
                             </Typography>
                           }
                           secondary={

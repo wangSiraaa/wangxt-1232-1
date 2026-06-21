@@ -3,7 +3,7 @@ export enum UserRole {
   PROPOSITION_CENTER = 'proposition_center',
   PRINTING_FACTORY = 'printing_factory',
   ESCORT = 'escort',
-  EXAM_SITE = 'exam_site',
+  EXAM_SITE = 'exam_site_director',
 }
 
 export enum BatchStatus {
@@ -20,14 +20,15 @@ export enum BatchStatus {
 
 export enum HandoverStatus {
   PENDING = 'pending',
-  ACCEPTED = 'accepted',
+  CONFIRMED = 'confirmed',
   REJECTED = 'rejected',
 }
 
 export enum ExceptionType {
   SEAL_DAMAGED = 'seal_damaged',
   PACKAGE_MISSING = 'package_missing',
-  QUANTITY_MISMATCH = 'quantity_mismatch',
+  COUNT_MISMATCH = 'count_mismatch',
+  TIME_VIOLATION = 'time_violation',
   OTHER = 'other',
 }
 
@@ -41,7 +42,7 @@ export enum ExceptionStatus {
 export interface User {
   id: string;
   username: string;
-  name: string;
+  fullName: string;
   role: UserRole;
   organization: string;
   createdAt: string;

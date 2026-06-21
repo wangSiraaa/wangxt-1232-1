@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { apiClient, authApi } from '@/api/client';
 import { User, UserRole } from '@/types';
 import { toast } from 'react-toastify';
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
@@ -13,7 +13,7 @@ interface AuthContextType {
   hasRole: (role: UserRole | UserRole[]) => boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -28,8 +28,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (savedToken && savedUser) {
         try {
           const parsedUser = JSON.parse(savedUser) as User;
+          const normalizedUser: User = {
+            ...parsedUser,
+            fullName: parsedUser.fullName || (parsedUser as any).name || '',
+          };
           setToken(savedToken);
-          setUser(parsedUser);
+          setUser(normalizedUser);
           apiClient.setToken(savedToken);
         } catch (error) {
           localStorage.removeItem('token');
@@ -54,7 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.setItem('token', accessToken);
       localStorage.setItem('user', JSON.stringify(userData));
 
-      toast.success(`欢迎，${userData.name}！`);
+      toast.success(`欢迎，${userData.fullName}！`);
     } catch (error) {
       throw error;
     }
@@ -90,10 +94,3 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};

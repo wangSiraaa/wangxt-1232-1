@@ -14,8 +14,8 @@ import {
   Alert,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
@@ -27,9 +27,13 @@ const Login: React.FC = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   const from = (location.state as any)?.from?.pathname || '/dashboard';
+
+  if (isAuthenticated) {
+    return <Navigate to={from} replace />;
+  }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

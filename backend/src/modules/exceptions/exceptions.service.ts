@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ExceptionRecord, ExceptionType, ExceptionStatus } from '@/entities/exception-record.entity';
 import { User } from '@/entities/user.entity';
-import { ExamBatch } from '@/entities/exam-batch.entity';
+import { ExamBatch, BatchStatus } from '@/entities/exam-batch.entity';
 import { SealBox } from '@/entities/seal-box.entity';
 import { ExamPackage } from '@/entities/exam-package.entity';
 
@@ -146,7 +146,7 @@ export class ExceptionsService {
     return count > 1;
   }
 
-  private getNextBatchStatus(batch: ExamBatch): string {
+  private getNextBatchStatus(batch: ExamBatch): BatchStatus {
     if (batch.status === 'exception') {
       return 'in_transit';
     }

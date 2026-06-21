@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import AppLayout from '@/components/Layout/AppLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Login from '@/pages/Login';
@@ -12,10 +13,40 @@ import ExamSite from '@/pages/ExamSite';
 import Exceptions from '@/pages/Exceptions';
 import Recovery from '@/pages/Recovery';
 import { UserRole } from '@/types';
+import { Box, CircularProgress } from '@mui/material';
+
+const RootLayout: React.FC = () => {
+  return (
+    <AuthProvider>
+      <Outlet />
+    </AuthProvider>
+  );
+};
+
+const FullPageLoader: React.FC = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+    }}
+  >
+    <CircularProgress />
+  </Box>
+);
 
 const RootRedirect: React.FC = () => {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <FullPageLoader />;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <Navigate to="/dashboard" replace />;
 };
 
@@ -29,74 +60,73 @@ const AppLayoutWithOutlet: React.FC = () => {
 
 const router = createBrowserRouter([
   {
-    path: '/login',
-    element: <Login />,
-  },
-  {
     path: '/',
-    element: (
-      <AuthProvider>
-        <RootRedirect />
-      </AuthProvider>
-    ),
-  },
-  {
-    path: '/',
-    element: (
-      <AuthProvider>
-        <ProtectedRoute>
-          <AppLayoutWithOutlet />
-        </ProtectedRoute>
-      </AuthProvider>
-    ),
+    element: <RootLayout />,
     children: [
       {
-        path: 'dashboard',
-        element: <Dashboard />,
+        path: 'login',
+        element: <Login />,
       },
       {
-        path: 'batches',
+        index: true,
+        element: <RootRedirect />,
+      },
+      {
         element: (
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PROPOSITION_CENTER]}>
-            <Batches />
+          <ProtectedRoute>
+            <AppLayoutWithOutlet />
           </ProtectedRoute>
         ),
-      },
-      {
-        path: 'printing',
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PRINTING_FACTORY]}>
-            <Printing />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'escort',
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ESCORT]}>
-            <Escort />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'exam-site',
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.EXAM_SITE]}>
-            <ExamSite />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'exceptions',
-        element: <Exceptions />,
-      },
-      {
-        path: 'recovery',
-        element: (
-          <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.EXAM_SITE]}>
-            <Recovery />
-          </ProtectedRoute>
-        ),
+        children: [
+          {
+            path: 'dashboard',
+            element: <Dashboard />,
+          },
+          {
+            path: 'batches',
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PROPOSITION_CENTER]}>
+                <Batches />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'printing',
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PRINTING_FACTORY]}>
+                <Printing />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'escort',
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ESCORT]}>
+                <Escort />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'exam-site',
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.EXAM_SITE]}>
+                <ExamSite />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'exceptions',
+            element: <Exceptions />,
+          },
+          {
+            path: 'recovery',
+            element: (
+              <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.EXAM_SITE]}>
+                <Recovery />
+              </ProtectedRoute>
+            ),
+          },
+        ],
       },
     ],
   },

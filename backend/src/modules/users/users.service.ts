@@ -52,7 +52,7 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async update(id: string, userData: Partial<User>): Promise<User> {
+  async update(id: string, userData: Partial<User> & { password?: string }): Promise<User> {
     const user = await this.findById(id);
     if (userData.password) {
       userData.passwordHash = await bcrypt.hash(userData.password, 10);

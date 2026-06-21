@@ -210,10 +210,10 @@ CREATE TRIGGER update_handover_records_updated_at BEFORE UPDATE ON handover_reco
 CREATE TRIGGER update_exception_records_updated_at BEFORE UPDATE ON exception_records FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE TRIGGER update_recovery_records_updated_at BEFORE UPDATE ON recovery_records FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
--- 插入初始测试用户
+-- 插入初始测试用户（admin 密码: admin123，其他用户密码: test123）
 INSERT INTO users (username, password_hash, full_name, role, organization, phone) VALUES
-('admin', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '系统管理员', 'admin', '考试管理中心', '13800000000'),
-('proposition', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '张命题', 'proposition_center', '命题中心', '13800000001'),
-('printer', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '李印刷', 'printing_factory', '保密印刷厂', '13800000002'),
-('escort1', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '王押运', 'escort', '押运公司一队', '13800000003'),
-('director1', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '赵主任', 'exam_site_director', '第一中学考点', '13800000004');
+('admin', '$2b$10$uYAyrY2LT0dr0SBwhJfImO5hE6Ds5ERjk.3pAIAcQ6mjQzo7RX5/2', '系统管理员', 'admin', '考试管理中心', '13800000000'),
+('proposition', '$2b$10$sVwyVxHyWBFz1vUrKFLRROnD3sR5iHGfKNxGgJsPAzixbXIL1dFUO', '张命题', 'proposition_center', '命题中心', '13800000001'),
+('printing', '$2b$10$sVwyVxHyWBFz1vUrKFLRROnD3sR5iHGfKNxGgJsPAzixbXIL1dFUO', '李印刷', 'printing_factory', '保密印刷厂', '13800000002'),
+('escort', '$2b$10$sVwyVxHyWBFz1vUrKFLRROnD3sR5iHGfKNxGgJsPAzixbXIL1dFUO', '王押运', 'escort', '押运公司一队', '13800000003'),
+('examsite', '$2b$10$sVwyVxHyWBFz1vUrKFLRROnD3sR5iHGfKNxGgJsPAzixbXIL1dFUO', '赵主任', 'exam_site_director', '第一中学考点', '13800000004');

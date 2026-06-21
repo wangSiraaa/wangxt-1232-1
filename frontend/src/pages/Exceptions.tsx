@@ -156,7 +156,8 @@ const Exceptions: React.FC = () => {
   const typeLabels: Record<ExceptionType, string> = {
     [ExceptionType.SEAL_DAMAGED]: '封签破损',
     [ExceptionType.PACKAGE_MISSING]: '试卷包缺失',
-    [ExceptionType.QUANTITY_MISMATCH]: '数量不匹配',
+    [ExceptionType.COUNT_MISMATCH]: '数量不匹配',
+    [ExceptionType.TIME_VIOLATION]: '时间违规',
     [ExceptionType.OTHER]: '其他异常',
   };
 
@@ -170,7 +171,8 @@ const Exceptions: React.FC = () => {
   const typeColors: Record<ExceptionType, string> = {
     [ExceptionType.SEAL_DAMAGED]: '#f44336',
     [ExceptionType.PACKAGE_MISSING]: '#ff9800',
-    [ExceptionType.QUANTITY_MISMATCH]: '#9c27b0',
+    [ExceptionType.COUNT_MISMATCH]: '#9c27b0',
+    [ExceptionType.TIME_VIOLATION]: '#2196f3',
     [ExceptionType.OTHER]: '#607d8b',
   };
 
@@ -383,7 +385,8 @@ const Exceptions: React.FC = () => {
               >
                 <MenuItem value={ExceptionType.SEAL_DAMAGED}>封签破损</MenuItem>
                 <MenuItem value={ExceptionType.PACKAGE_MISSING}>试卷包缺失</MenuItem>
-                <MenuItem value={ExceptionType.QUANTITY_MISMATCH}>数量不匹配</MenuItem>
+                <MenuItem value={ExceptionType.COUNT_MISMATCH}>数量不匹配</MenuItem>
+                <MenuItem value={ExceptionType.TIME_VIOLATION}>时间违规</MenuItem>
                 <MenuItem value={ExceptionType.OTHER}>其他异常</MenuItem>
               </Select>
             </FormControl>
