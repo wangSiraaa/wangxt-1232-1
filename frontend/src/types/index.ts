@@ -102,6 +102,7 @@ export interface HandoverRecord {
   status: HandoverStatus;
   sealIntact: boolean;
   remarks: string;
+  arrivalRemark: string;
   createdAt: string;
   confirmedAt: string;
 }

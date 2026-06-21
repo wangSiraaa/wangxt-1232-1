@@ -102,6 +102,7 @@ CREATE TABLE handover_records (
     handover_time TIMESTAMP,
     location VARCHAR(200),
     remark TEXT,
+    arrival_remark TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

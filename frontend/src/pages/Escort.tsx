@@ -60,11 +60,13 @@ const Escort: React.FC = () => {
   const [openScanDialog, setOpenScanDialog] = useState(false);
   const [openHandoverDialog, setOpenHandoverDialog] = useState(false);
   const [scannedBox, setScannedBox] = useState<SealBox | null>(null);
+  const [scannedQrData, setScannedQrData] = useState<string>('');
   const [selectedBatch, setSelectedBatch] = useState<ExamBatch | null>(null);
   const [formData, setFormData] = useState({
     toUserId: '',
     remarks: '',
     sealIntact: true,
+    arrivalRemark: '',
   });
   const [qrInput, setQrInput] = useState('');
   const { hasRole } = useAuth();
@@ -103,6 +105,7 @@ const Escort: React.FC = () => {
       const res = await handoverApi.scan(qrInput);
       const box = (res as any).box || res;
       setScannedBox(box);
+      setScannedQrData(qrInput);
       setQrInput('');
       setOpenScanDialog(false);
       setOpenHandoverDialog(true);
@@ -120,15 +123,15 @@ const Escort: React.FC = () => {
 
     try {
       await handoverApi.create({
-        boxId: scannedBox.id,
+        qrData: scannedQrData,
         toUserId: formData.toUserId,
-        sealIntact: formData.sealIntact,
-        remarks: formData.remarks,
+        arrivalRemark: formData.arrivalRemark,
       });
       toast.success('交接创建成功');
       setOpenHandoverDialog(false);
       setScannedBox(null);
-      setFormData({ toUserId: '', remarks: '', sealIntact: true });
+      setScannedQrData('');
+      setFormData({ toUserId: '', remarks: '', sealIntact: true, arrivalRemark: '' });
       loadData();
     } catch (error) {
         toast.error('创建交接失败');
@@ -522,20 +525,15 @@ const Escort: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, toUserId: e.target.value })}
               placeholder="输入接收人用户ID"
             />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.sealIntact}
-                  onChange={(e) => setFormData({ ...formData, sealIntact: e.target.checked })}
-                />
-              }
-              label="封签完好"
+            <TextField
+              label="到达说明"
+              fullWidth
+              multiline
+              rows={3}
+              value={formData.arrivalRemark}
+              onChange={(e) => setFormData({ ...formData, arrivalRemark: e.target.value })}
+              placeholder="请填写押运到达说明，如到达时间、交接情况等"
             />
-            {!formData.sealIntact && (
-              <Alert severity="warning" icon={<WarningIcon />}>
-                封签破损将自动进入异常流程！
-              </Alert>
-            )}
             <TextField
               label="备注"
               fullWidth
@@ -543,7 +541,7 @@ const Escort: React.FC = () => {
               rows={2}
               value={formData.remarks}
               onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
-              placeholder="可选：添加备注信息"
+              placeholder="可选：添加其他备注信息"
             />
           </Box>
         </DialogContent>

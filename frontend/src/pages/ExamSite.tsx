@@ -31,7 +31,7 @@ import {
   AccessTime as TimeIcon,
 } from '@mui/icons-material';
 import { batchesApi, sealBoxesApi, unsealApi, packagesApi, handoverApi } from '@/api/client';
-import { ExamBatch, BatchStatus, SealBox, ExamPackage, UnsealRecord } from '@/types';
+import { ExamBatch, BatchStatus, SealBox, ExamPackage, UnsealRecord, HandoverRecord } from '@/types';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 
@@ -59,8 +59,11 @@ const ExamSite: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [openPackageDialog, setOpenPackageDialog] = useState(false);
   const [openUnsealDialog, setOpenUnsealDialog] = useState(false);
+  const [openDeliveryDialog, setOpenDeliveryDialog] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<ExamPackage | null>(null);
   const [packageInfo, setPackageInfo] = useState<any>(null);
+  const [deliveryBatch, setDeliveryBatch] = useState<ExamBatch | null>(null);
+  const [deliveryHandoverRecords, setDeliveryHandoverRecords] = useState<HandoverRecord[]>([]);
   const [formData, setFormData] = useState({
     witnesses: '',
     remarks: '',
@@ -183,11 +186,26 @@ const ExamSite: React.FC = () => {
     };
   
 
-  const handleConfirmDelivery = async (batchId: string) => {
-    if (!confirm('确认所有封签箱已完好送达？')) return;
+  const handleConfirmDelivery = async (batch: ExamBatch) => {
+    setDeliveryBatch(batch);
     try {
-      await batchesApi.updateStatus(batchId, BatchStatus.DELIVERED);
+      const records = await handoverApi.list({ batchId: batch.id, status: 'pending' });
+      const recordsData = Array.isArray(records) ? records : (records as any).data || [];
+      setDeliveryHandoverRecords(recordsData);
+      setOpenDeliveryDialog(true);
+    } catch (error) {
+      toast.error('加载交接记录失败');
+    }
+  };
+
+  const handleConfirmDeliverySubmit = async () => {
+    if (!deliveryBatch) return;
+    try {
+      await batchesApi.updateStatus(deliveryBatch.id, BatchStatus.DELIVERED);
       toast.success('已确认入库');
+      setOpenDeliveryDialog(false);
+      setDeliveryBatch(null);
+      setDeliveryHandoverRecords([]);
       loadData();
     } catch (error) {
         toast.error('确认失败');
@@ -263,7 +281,7 @@ const ExamSite: React.FC = () => {
             <IconButton
               size="small"
               color="success"
-              onClick={() => handleConfirmDelivery(params.row.id)}
+              onClick={() => handleConfirmDelivery(params.row)}
               title="确认入库"
             >
               <CheckIcon fontSize="small" />
@@ -640,6 +658,98 @@ const ExamSite: React.FC = () => {
             startIcon={<UnsealIcon />}
           >
             确认启封
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openDeliveryDialog}
+        onClose={() => { setOpenDeliveryDialog(false); setDeliveryBatch(null); setDeliveryHandoverRecords([]); }}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>确认入库</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Alert severity="info" icon={<InventoryIcon />}>
+              请核对以下封签箱的封签状态和到达说明，确认无误后再进行入库操作
+            </Alert>
+            {deliveryBatch && (
+              <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                  批次信息
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="body2" color="text.secondary">批次号</Typography>
+                    <Typography variant="body1">{deliveryBatch.batchCode}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="body2" color="text.secondary">考试名称</Typography>
+                    <Typography variant="body1">{deliveryBatch.examName}</Typography>
+                  </Grid>
+                </Grid>
+              </Paper>
+            )}
+            {deliveryHandoverRecords.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 3 }}>
+                暂无待接收的交接记录
+              </Typography>
+            ) : (
+              deliveryHandoverRecords.map((record) => {
+                const box = sealBoxes.find(b => b.id === record.boxId);
+                return (
+                  <Paper key={record.id} sx={{ p: 2, borderRadius: 2 }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={4}>
+                        <Typography variant="body2" color="text.secondary">封签箱</Typography>
+                        <Typography variant="body1" fontWeight="medium">
+                          {box?.boxNumber || record.boxId.substring(0, 8)}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <Typography variant="body2" color="text.secondary">封签状态</Typography>
+                        <Chip
+                          label={record.sealIntact ? '完好' : '破损'}
+                          size="small"
+                          color={record.sealIntact ? 'success' : 'error'}
+                          sx={{ mt: 0.5 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <Typography variant="body2" color="text.secondary">押运员</Typography>
+                        <Typography variant="body1">
+                          {record.fromUserId ? record.fromUserId.substring(0, 8) : '-'}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          到达说明
+                        </Typography>
+                        <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'grey.50' }}>
+                          <Typography variant="body2">
+                            {record.arrivalRemark || '暂无到达说明'}
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                    </Grid>
+                  </Paper>
+                );
+              })
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setOpenDeliveryDialog(false); setDeliveryBatch(null); setDeliveryHandoverRecords([]); }}>
+            取消
+          </Button>
+          <Button
+            onClick={handleConfirmDeliverySubmit}
+            variant="contained"
+            color="success"
+            startIcon={<CheckIcon />}
+          >
+            确认入库
           </Button>
         </DialogActions>
       </Dialog>

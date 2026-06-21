@@ -55,10 +55,10 @@ export class HandoverController {
   @Post()
   @Roles('printing_factory', 'escort', 'admin')
   createHandover(
-    @Body() body: { qrData: string; toUserId: string },
+    @Body() body: { qrData: string; toUserId: string; arrivalRemark?: string },
     @Request() req,
   ): Promise<HandoverRecord> {
-    return this.handoverService.createHandover(body.qrData, body.toUserId, req.user as User);
+    return this.handoverService.createHandover(body.qrData, body.toUserId, body.arrivalRemark || '', req.user as User);
   }
 
   @Put(':id/confirm')

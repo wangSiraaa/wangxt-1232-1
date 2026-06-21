@@ -93,7 +93,7 @@ export class HandoverService {
     };
   }
 
-  async createHandover(qrData: string, toUserId: string, user: User): Promise<HandoverRecord> {
+  async createHandover(qrData: string, toUserId: string, arrivalRemark: string, user: User): Promise<HandoverRecord> {
     const decoded = await this.decodeQrCode(qrData);
     const box = await this.sealBoxesRepository.findOne({
       where: { id: decoded.boxId },
@@ -131,6 +131,7 @@ export class HandoverService {
       fromUser: user,
       toUser,
       status: 'pending',
+      arrivalRemark: arrivalRemark || null,
     });
 
     return this.handoverRepository.save(handover);

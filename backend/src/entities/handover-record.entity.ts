@@ -48,6 +48,9 @@ export class HandoverRecord {
   @Column({ type: 'text', nullable: true })
   remark: string;
 
+  @Column({ name: 'arrival_remark', type: 'text', nullable: true })
+  arrivalRemark: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
